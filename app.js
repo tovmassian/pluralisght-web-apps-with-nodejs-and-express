@@ -7,16 +7,25 @@ const path = require('path');
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use(morgan('combined')); // HTTP request logger middleware for node.js
 app.use(express.static(path.join(__dirname, '/public/')));
 app.use('/css', express.static(path.join(__dirname, '/node_modules/bootstrap/dist/css/')));
 app.use('/js', express.static(path.join(__dirname, '/node_modules/bootstrap/dist/js')));
 app.use('/js', express.static(path.join(__dirname, '/node_modules/jquery/dist/')));
 
-app.use(morgan('combined'));
+app.set('views', './src/views');
+app.set('view engine', 'ejs');
+
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '/views', '/index.html'));
+    res.render('index', {
+        title: 'Library',
+        nav: [
+            { link: '/authors', title: 'Authors' },
+            { link: '/books', title: 'Books' },
+        ],
+    }); // instead of using sendFile we use render as we also use templating engine
 });
 
 app.listen(port, () => {
-  debug(`Listening port at  ${chalk.green(port)}`);
+    debug(`Listening port at  ${chalk.green(port)}`);
 });
