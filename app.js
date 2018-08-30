@@ -3,6 +3,8 @@ const chalk = require('chalk');
 const debug = require('debug')('app');
 const morgan = require('morgan');
 const path = require('path');
+const sql = require('mssql');
+const config = require('./src/config/dbConfig');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -11,6 +13,7 @@ const nav = [
     { link: '/authors', title: 'Authors' },
 ];
 
+sql.connect(config).catch(err => debug(err));
 app.use(morgan('combined')); // HTTP request logger middleware for node.js
 app.use(express.static(path.join(__dirname, '/public/')));
 app.use('/css', express.static(path.join(__dirname, '/node_modules/bootstrap/dist/css/')));
