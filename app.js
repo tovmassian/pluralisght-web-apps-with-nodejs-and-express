@@ -18,8 +18,10 @@ app.use('/js', express.static(path.join(__dirname, '/node_modules/bootstrap/dist
 app.use('/js', express.static(path.join(__dirname, '/node_modules/jquery/dist/')));
 
 const bookRouter = require('./src/routes/bookRoutes')(nav);
+const adminRouter = require('./src/routes/adminRoutes')(nav);
 
 app.use('/books', bookRouter);
+app.use('/admin', adminRouter);
 
 app.set('views', './src/views');
 app.set('view engine', 'ejs');
