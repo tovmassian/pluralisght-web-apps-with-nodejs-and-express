@@ -1,11 +1,17 @@
 const express = require('express');
 const bookRouter = express.Router();
 const { MongoClient, ObjectId } = require('mongodb');
+const { url, dbName } = require('../config/dbConfig');
 const debug = require('debug')('app:bookRoutes');
 
 function router(nav) {
-    const url = 'mongodb://localhost:27017';
-    const dbName = 'libraryApp';
+    bookRouter.use((req, res, next) => {
+        if (req.user) {
+            next();
+        } else {
+            res.redirect('/');
+        }
+    });
 
     bookRouter.route('/')
         .get((req, res) => {
@@ -28,7 +34,7 @@ function router(nav) {
                     debug(err.stack);
                 }
                 client.close();
-            })();
+            }());
         });
 
     bookRouter.route('/:id')
@@ -54,7 +60,7 @@ function router(nav) {
                     debug(err.stack);
                 }
                 client.close();
-            })();
+            }());
         });
     return bookRouter
 }

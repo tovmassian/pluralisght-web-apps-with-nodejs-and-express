@@ -1,6 +1,7 @@
 const express = require('express');
 const adminRouter = express.Router();
 const { MongoClient } = require('mongodb');
+const { url, dbName } = require('../config/dbConfig');
 const debug = require('debug')('app:adminRoutes');
 const books = [
     { title: 'Little Prince', author: 'Antoine de Saint-Exupéry' },
@@ -10,12 +11,9 @@ const books = [
     { title: 'Harry Potter and the Half-Blood Prince', author: 'J. K. Rowling'}
 ];
 
-function router(nav) {
+function router() {
     adminRouter.route('/')
         .get((req, res) => {
-            const url = 'mongodb://localhost:27017';
-            const dbName = 'libraryApp';
-
             (async function mongo() {
                 let client;
                 try {
@@ -30,7 +28,7 @@ function router(nav) {
                     debug(err.stack);
                 }
                 client.close();
-            })();
+            }());
         });
 
     return adminRouter
