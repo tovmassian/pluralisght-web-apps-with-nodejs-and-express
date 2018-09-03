@@ -1,67 +1,18 @@
 const express = require('express');
 const bookRouter = express.Router();
-const { MongoClient, ObjectId } = require('mongodb');
-const { url, dbName } = require('../config/dbConfig');
-const debug = require('debug')('app:bookRoutes');
+const bookController = require('../controllers/bookController');
+const bookService = require('../services/goodreadsService');
+
 
 function router(nav) {
-    bookRouter.use((req, res, next) => {
-        if (req.user) {
-            next();
-        } else {
-            res.redirect('/');
-        }
-    });
+    const { getIndex, getByIndex, middleware } = bookController(bookService, nav);
 
+    bookRouter.use(middleware);
     bookRouter.route('/')
-        .get((req, res) => {
-            (async function mongo() {
-                let client;
-                try {
-                    client = await MongoClient.connect(url, { useNewUrlParser: true });
-                    debug('correctly connected to the server');
-
-                    const db = client.db(dbName); // defining db in mongodb
-
-                    const col = await db.collection('books');
-                    const books = await col.find().toArray();
-                    res.render('booksView', {
-                        title: 'Books',
-                        nav,
-                        books,
-                    }); // instead of using sendFile we use render as we also use templating engine
-                } catch(err) {
-                    debug(err.stack);
-                }
-                client.close();
-            }());
-        });
-
+        .get(getIndex);
     bookRouter.route('/:id')
-        .get((req, res) => {
-            const { id } = req.params;
+        .get(getByIndex);
 
-            (async function mongo() {
-                let client;
-                try {
-                    client = await MongoClient.connect(url, { useNewUrlParser: true });
-                    debug('correctly connected to the server');
-
-                    const db = client.db(dbName); // defining db in mongodb
-
-                    const col = await db.collection('books');
-                    const book = await col.findOne({_id: new ObjectId(id)});
-                    res.render('bookListView', {
-                        title: 'Book',
-                        nav,
-                        book: book,
-                    }); // instead of using sendFile we use render as we also use templating engine
-                } catch(err) {
-                    debug(err.stack);
-                }
-                client.close();
-            }());
-        });
     return bookRouter
 }
 
